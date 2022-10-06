@@ -26,6 +26,12 @@ resource "google_project_service" "resourcemanager" {
   disable_on_destroy = false
 }
 
+resource "google_project_service" "cloudbuild" {
+  provider           = google-beta
+  service            = "cloudbuild.googleapis.com"
+  disable_on_destroy = false
+}
+
 # This is used so there is some time for the activation of the API's to propagate through
 # Google Cloud before actually calling them.
 resource "time_sleep" "wait_30_seconds" {
@@ -34,7 +40,8 @@ resource "time_sleep" "wait_30_seconds" {
     google_project_service.iam,
     google_project_service.artifactregistry,
     google_project_service.cloudrun,
-    google_project_service.resourcemanager
+    google_project_service.resourcemanager,
+    google_project_service.cloudbuild,
   ]
 }
 
