@@ -1,0 +1,29 @@
+steps:
+  
+  # Run unit tests
+  - name: docker.io/library/python:3.9.10
+    entrypoint: pip
+    args: ["install", "-r", "dev-requirements.txt", "--user"]
+
+  - name: docker.io/library/python:3.9.10
+    entrypoint: python
+    args: ["-m", "pytest", "-vv", "-s"]
+
+  # Docker Build
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 
+           '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE_NAME}', '.']
+
+  # Docker push to Google Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push',  '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE_NAME}']
+
+timeout: 1200s
+
+substitutions:
+  _REGION: us-central1
+  _ARTIFACT_REGISTRY_REPO: docker-repository
+  _SERVICE_NAME: test-api
+
+images:
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/${_SERVICE_NAME}
