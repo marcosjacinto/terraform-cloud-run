@@ -1,17 +1,7 @@
-import logging
-
 import uvicorn
 from fastapi import FastAPI
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(filename)s::%(lineno)d::%(message)s",
-    handlers=[
-        logging.StreamHandler(),
-    ],
-)
-
-logger = logging.getLogger(__name__)
+from api import logger
 
 
 app = FastAPI()
@@ -25,7 +15,7 @@ async def main():
     return {"msg": "API is running"}
 
 @app.get("/warning")
-async def main():
+async def warning():
 
     logger.warning("Something occurred")
 
