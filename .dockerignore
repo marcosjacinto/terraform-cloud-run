@@ -91,3 +91,7 @@ venv/
 */*.swp
 */*/*.swp
 */*/*/*.swp
+
+# Others
+tests/
+infra/

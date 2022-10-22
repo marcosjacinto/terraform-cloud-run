@@ -8,7 +8,16 @@ resource "google_artifact_registry_repository" "docker_repo" {
   depends_on = [
     time_sleep.wait_30_seconds
   ]
-  #   disable_on_destroy = true
+}
+
+module "gcloud" {
+  source  = "terraform-google-modules/gcloud/google"
+  version = "~> 2.0"
+
+  platform = "linux"
+
+  create_cmd_entrypoint  = "gcloud"
+  create_cmd_body        = "auth configure-docker ${var.region}-docker.pkg.dev"
 }
 
 
