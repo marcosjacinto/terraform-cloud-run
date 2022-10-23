@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 
-from api import logger
+from config import logger
 
 
 app = FastAPI()
@@ -13,6 +13,7 @@ async def main():
     logger.info("Inside main ")
 
     return {"msg": "API is running"}
+
 
 @app.get("/warning")
 async def warning():
