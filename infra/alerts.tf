@@ -1,6 +1,6 @@
 resource "google_monitoring_notification_channel" "monitoring_email" {
   display_name = "Monitoring E-mail"
-  type = "email"
+  type         = "email"
   labels = {
     email_address = var.monitoring_email
   }
@@ -8,8 +8,8 @@ resource "google_monitoring_notification_channel" "monitoring_email" {
 
 
 resource "google_monitoring_alert_policy" "service_alert" {
-  display_name = "${var.docker_image}-log-metric-alert"
-  combiner = "OR"
+  display_name = "${var.docker_image}-log-alert"
+  combiner     = "OR"
   conditions {
     display_name = "${var.docker_image}-errors"
     condition_matched_log {
@@ -24,6 +24,6 @@ resource "google_monitoring_alert_policy" "service_alert" {
     }
   }
 
-  notification_channels = [ google_monitoring_notification_channel.monitoring_email.name ]
+  notification_channels = [google_monitoring_notification_channel.monitoring_email.name]
 }
 
