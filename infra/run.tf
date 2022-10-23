@@ -1,7 +1,7 @@
 resource "docker_registry_image" "api_image" {
   name = "${var.region}-docker.pkg.dev/${var.project_id}/${var.repository}/${var.docker_image}"
   build {
-    context = ".."
+    context = abspath("..")
   }
   depends_on = [
     module.gcloud,
@@ -27,7 +27,7 @@ resource "google_cloud_run_service" "api_test" {
     }
     spec {
       containers {
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/${var.repository}/${var.docker_image}"
+        image = "${docker_registry_image.api_image.name}@${docker_registry_image.api_image.sha256_digest}"
         # env {
 
         # }
@@ -64,10 +64,6 @@ output "cloud_run_instance_url" {
 
 output "cloud_run_instance_id" {
   value = google_cloud_run_service.api_test.id
-}
-
-output "cloud_run_instance_revision_name" {
-  value = google_cloud_run_service.api_test.status.latest_created_revision_name
 }
 
 output "cloud_run_instance_service_name" {
