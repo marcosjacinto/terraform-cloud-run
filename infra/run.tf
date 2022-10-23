@@ -62,6 +62,18 @@ output "cloud_run_instance_url" {
   value = google_cloud_run_service.api_test.status.0.url
 }
 
+output "cloud_run_instance_id" {
+  value = google_cloud_run_service.api_test.id
+}
+
+output "cloud_run_instance_revision_name" {
+  value = google_cloud_run_service.api_test.status.latest_created_revision_name
+}
+
+output "cloud_run_instance_service_name" {
+  value = google_cloud_run_service.api_test.name
+}
+
 
 # Create a policy that allows all users to invoke the API
 data "google_iam_policy" "noauth" {
