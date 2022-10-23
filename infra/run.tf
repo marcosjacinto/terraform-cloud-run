@@ -1,14 +1,10 @@
-# Deploy image to Cloud Run
-resource "null_resource" "cloud_build_script" {
-  provisioner "local-exec" {
-    command = "gcloud builds submit --config=../cloudbuild.yaml ..  "
-    environment = {
-      _REGION                 = var.region
-      _ARTIFACT_REGISTRY_REPO = var.repository
-      _SERVICE_NAME           = var.docker_image
-    }
+resource "docker_registry_image" "api_image" {
+  name = "${var.region}-docker.pkg.dev/${var.project_id}/${var.repository}/${var.docker_image}"
+  build {
+    context = abspath("..")
   }
   depends_on = [
+    module.gcloud,
     google_artifact_registry_repository_iam_member.docker_pusher_iam
   ]
 }
@@ -31,7 +27,7 @@ resource "google_cloud_run_service" "api_test" {
     }
     spec {
       containers {
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/${var.repository}/${var.docker_image}"
+        image = "${docker_registry_image.api_image.name}@${docker_registry_image.api_image.sha256_digest}"
         # env {
 
         # }
@@ -45,7 +41,7 @@ resource "google_cloud_run_service" "api_test" {
           }
         }
       }
-      container_concurrency = 0
+      container_concurrency = 1
       timeout_seconds       = 60
       service_account_name  = google_service_account.api_service_account.email
     }
@@ -58,12 +54,20 @@ resource "google_cloud_run_service" "api_test" {
   depends_on = [
     google_artifact_registry_repository_iam_member.docker_pusher_iam,
     google_service_account.api_service_account,
-    null_resource.cloud_build_script
+    docker_registry_image.api_image
   ]
 }
 
 output "cloud_run_instance_url" {
   value = google_cloud_run_service.api_test.status.0.url
+}
+
+output "cloud_run_instance_id" {
+  value = google_cloud_run_service.api_test.id
+}
+
+output "cloud_run_instance_service_name" {
+  value = google_cloud_run_service.api_test.name
 }
 
 

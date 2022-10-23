@@ -26,3 +26,8 @@ variable "docker_image" {
   type        = string
   default     = "test-api"
 }
+
+variable "monitoring_email" {
+  description = "Monitoring e-mail"
+  type        = string
+}
