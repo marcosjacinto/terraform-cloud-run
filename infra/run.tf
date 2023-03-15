@@ -1,14 +1,3 @@
-resource "docker_registry_image" "api_image" {
-  name = "${var.region}-docker.pkg.dev/${var.project_id}/${var.repository}/${var.docker_image}"
-  build {
-    context = abspath("..")
-  }
-  depends_on = [
-    module.gcloud,
-    google_artifact_registry_repository_iam_member.docker_pusher_iam
-  ]
-}
-
 resource "google_cloud_run_service" "api_test" {
   provider = google-beta
   name     = var.docker_image
@@ -27,10 +16,8 @@ resource "google_cloud_run_service" "api_test" {
     }
     spec {
       containers {
-        image = "${docker_registry_image.api_image.name}@${docker_registry_image.api_image.sha256_digest}"
-        # env {
-
-        # }
+        # use basic image
+        image = "us-docker.pkg.dev/cloudrun/container/hello"
         ports {
           container_port = 8000
         }
@@ -51,10 +38,31 @@ resource "google_cloud_run_service" "api_test" {
     latest_revision = true
   }
 
+  # depends_on = [
+  #   google_artifact_registry_repository_iam_member.docker_pusher_iam,
+  #   google_service_account.api_service_account,
+  #   docker_registry_image.api_image
+  # ]
+
+  lifecycle {
+    ignore_changes = [
+      template[0].spec[0].containers[0].image
+    ]
+  }
+}
+
+module "cloudbuild" {
+  source                 = "terraform-google-modules/gcloud/google"
+  # skip_download          = true
+  version                = "3.1.2"
+  platform               = "linux"
+  additional_components  = ["beta"]
+  create_cmd_entrypoint  = "gcloud"
+  create_cmd_body        = "builds submit --config=${var.cloud_build_path} ${var.package_path} --substitutions _REGION=${var.region},_ARTIFACT_REGISTRY_REPO=${var.repository},_SERVICE_NAME=${var.service_name},_TIMESTAMP=${var.timestamp_trigger}"
+  destroy_cmd_entrypoint = "gcloud"
+  destroy_cmd_body       = "artifacts docker images delete ${var.region}-docker.pkg.dev/${var.project_id}/${var.repository}/${var.service_name} --delete-tags"
   depends_on = [
-    google_artifact_registry_repository_iam_member.docker_pusher_iam,
-    google_service_account.api_service_account,
-    docker_registry_image.api_image
+    google_cloud_run_service.api_test
   ]
 }
 

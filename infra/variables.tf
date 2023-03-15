@@ -31,3 +31,15 @@ variable "monitoring_email" {
   description = "Monitoring e-mail"
   type        = string
 }
+
+variable "cloud_build_path" {
+  description = "Path to the Cloud Build configuration file"
+  type        = string
+  default     = "../cloudbuild.yaml"
+}
+
+variable "package_path" {
+  description = "Path to the package to be built"
+  type        = string
+  default     = "../"
+}

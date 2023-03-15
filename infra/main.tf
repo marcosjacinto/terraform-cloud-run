@@ -17,11 +17,3 @@ provider "google-beta" {
   zone    = var.zone
 }
 
-provider "docker" {
-  host = "unix:///var/run/docker.sock"
-  registry_auth {
-    address = "${var.region}-docker.pkg.dev"
-    config_file = pathexpand("~/.docker/config.json")
-  }
-}
-
