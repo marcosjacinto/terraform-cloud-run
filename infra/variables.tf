@@ -27,6 +27,12 @@ variable "docker_image" {
   default     = "test-api"
 }
 
+variable "service_name" {
+  description = "The name of the Docker image"
+  type        = string
+  default     = "test-api"
+}
+
 variable "monitoring_email" {
   description = "Monitoring e-mail"
   type        = string
@@ -42,4 +48,10 @@ variable "package_path" {
   description = "Path to the package to be built"
   type        = string
   default     = "../"
+}
+
+variable "timestamp_trigger" {
+  description = "Timestamp trigger"
+  type        = string
+  default     = ""
 }
